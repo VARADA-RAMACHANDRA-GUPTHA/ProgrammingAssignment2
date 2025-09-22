@@ -1,43 +1,44 @@
-# This function creates a special "matrix" object that can cache its inverse
-makeCacheMatrix <- function() {
-  mat <- NULL
-  inv_cache <- NULL
- 
-  setMatrix <- function(x) {
-    mat <<- x
-    inv_cache <<- NULL
-  }
- 
-  getMatrix <- function() {
-    mat
-  }
-# Create a special "matrix" object
-special_matrix <- makeCacheMatrix()
- 
-# Set the matrix
-special_matrix$setMatrix(matrix(c(1, 2, 3, 4), 2, 2))
- 
-# Compute and cache the inverse
-inverse_matrix <- cacheSolve(special_matrix)
-print(inverse_matrix)
- 
-# Retrieve the cached inverse
-cached_inverse <- cacheSolve(special_matrix)
-print(cached_inverse)
- 
-  getInverse <- function() {
-    if (is.null(inv_cache)) {
-      inv_cache <<- solve(mat)
-    }
-    inv_cache
-  }
- 
-  list(setMatrix = setMatrix, getInverse = getInverse)
-}
- 
-# This function computes the inverse of the special "matrix" returned by makeCacheMatrix
-cacheSolve <- function(x, ...) {
-  inv_cache <- x$getInverse()
-  inv_cache
-}
- 
+## First, source your functions (assuming they're in cachematrix.R)source("cachematrix.R")
+
+## Example 1: Creating a 2x2 matrix
+# Create a test matrix
+test_matrix <- matrix(c(4, 3, 3, 2), nrow=2, ncol=2)
+print("Original Matrix:")
+print(test_matrix)
+
+# Create the special matrix object
+cached_matrix <- makeCacheMatrix(test_matrix)
+
+# First time computing inverse - should calculate
+print("First time computing inverse:")
+inverse1 <- cacheSolve(cached_matrix)
+print(inverse1)
+
+# Second time computing inverse - should retrieve from cache
+print("Second time computing inverse (should use cache):")
+inverse2 <- cacheSolve(cached_matrix)
+print(inverse2)
+
+## Example 2: Testing with a different matrix
+# Change the matrix
+new_matrix <- matrix(c(2, 1, 1, 1), nrow=2, ncol=2)
+print("\nNew Matrix:")
+print(new_matrix)
+
+# Set the new matrix
+cached_matrix$set(new_matrix)
+
+# Computing inverse of new matrix - should calculate
+print("Computing inverse of new matrix:")
+inverse3 <- cacheSolve(cached_matrix)
+print(inverse3)
+
+## Verification
+# Verify that the inverse is correct by multiplying original matrix with its inverse
+print("\nVerification for first matrix:")
+print("Original matrix × its inverse (should be identity matrix):")
+print(test_matrix %*% inverse1)
+
+print("\nVerification for second matrix:")
+print("New matrix × its inverse (should be identity matrix):")
+print(new_matrix %*% inverse3)
